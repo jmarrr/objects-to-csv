@@ -131,9 +131,14 @@ async function convert(data, header = true, allColumns = false) {
   }
 
   // Add all other rows:
-  csvInput.push(
-    ...data.map(row => columnNames.map(column => row[column])),
-  );
+  // Prevents stack size exceeded issue
+  for (const row of data) {
+    const col = [];
+    for (const column of columnNames) {
+      col.push(row[column])
+    }
+    csvInput.push(col);
+  }
 
   return await csv.stringify(csvInput);
 }
